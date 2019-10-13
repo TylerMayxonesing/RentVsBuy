@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
-project(Rent)
+project(RentVsBuy)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(Rent main.cpp)
+add_executable(RentVsBuy main.cpp RentVsBuy.cpp RentVsBuy.h)
