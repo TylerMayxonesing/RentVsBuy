@@ -12,8 +12,8 @@ void HomeBuyingInfo() {
   double loanTerm;
   double taxes;
   double appreciation;
-  double homeTax;
-  double mortgage;
+  double propertyTax;
+  int mortgage;
   double inflationRate;
   int years;
 
@@ -32,35 +32,19 @@ void HomeBuyingInfo() {
   std::cin >> loanTerm;
 
   mortgage = 12*(loanAmount * (loanInterest / 12) * pow((1 + (loanInterest / 12)), (12 * loanTerm))) / (pow((1 + (loanInterest / 12)), (12 * loanTerm)) - 1);
+  std::cout << mortgage << std::endl;
 
   std::cout << "Enter the property tax rate on the home: ";
-  std::cin >> taxes;
-  homeTax = taxes*price;
+  std::cin >> propertyTax;
+  taxes = propertyTax*price;
+  std::cout << "Taxes: " << taxes << std::endl;
 
   float maintenance = 0.01 * price;
+  std::cout << "Maintenance: " << maintenance << std::endl;
 
   std::cout << "Enter the rate at which you expect your home to appreciate each year:";
   std::cin >> appreciation;
-
-  std::cout << "Enter the expected average yearly inflation rate: ";
-  std::cin >> inflationRate;
-
-  std::cout << "Enter how many years in the future you want to look: ";
-  std::cin >> years;
-
-  float equivalence = homeTax*pow((1 + inflationRate),years);
-
-  float total = equivalence + maintenance + mortgage + downPayment;
-  std::cout << total;
-
 }
-
-
-
-
-
-
-
 
 void CommuteFromHome() {
   double miles;
@@ -80,6 +64,7 @@ void CommuteFromHome() {
   std::cout << "Enter how much it costs to drive your car per mile: ";
   std::cin >> cost;
 }
+
 void RentingInfo() {
   double monthlyRent;
   double returnRate;
@@ -89,8 +74,8 @@ void RentingInfo() {
 
   std::cout << "Enter your expected annual average rate of return on your investments: ";
   std:: cin >> returnRate;
-
 }
+
 void CommuteFromApartment() {
   double miles;
   int choice;
@@ -116,4 +101,30 @@ void CommuteFromApartment() {
 
   std::cout << "Enter how many years in the future you want to look: ";
   std::cin >> years;
+}
+
+
+double modeOfTransportation(int choice) {
+  double cost;
+  std::cout << "How will you be getting to work from your apartment?\n"
+               "Enter 1 for driving.\n"
+               "Enter 2 for public transit.\n"
+               "Enter 3 for biking, walking, etc.\n"
+               "Enter your choice: ";
+  if (choice == 1){
+    std::cout << "Enter how much it costs to drive your car per mile: ";
+    std::cin >> cost;
+  }
+
+  if (choice == 2){
+    std::cout << "Enter your monthly public transit costs: ";
+    std::cin >> cost;
+  }
+
+  if (choice == 3){
+    exit;
+  }
+
+  return cost;
+
 }

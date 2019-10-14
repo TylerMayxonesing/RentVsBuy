@@ -17,5 +17,5 @@ void CommuteFromHome();
 void RentingInfo();
 void CommuteFromApartment();
 void RentVsBuy();
-
+double modeOfTransportation(int);
 #endif //RENTVSBUY__RENTVSBUY_H_
