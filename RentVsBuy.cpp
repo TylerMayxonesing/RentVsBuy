@@ -7,10 +7,15 @@
 void HomeBuyingInfo() {
   double price;
   double downPayment;
+  double loanAmount;
   double loanInterest;
   double loanTerm;
   double taxes;
   double appreciation;
+  double homeTax;
+  double mortgage;
+  double inflationRate;
+  int years;
 
   std::cout << "Enter the purchase price of the home: ";
   std::cin >> price;
@@ -18,19 +23,45 @@ void HomeBuyingInfo() {
   std::cout << "Enter your down payment: ";
   std::cin >> downPayment;
 
+  loanAmount = price - downPayment;
+
   std::cout << "Enter the interest rate on your loan: ";
   std::cin >> loanInterest;
 
   std::cout << "Enter the term of your loan: ";
   std::cin >> loanTerm;
 
-  std::cout << "Enter the property tax rate or the home: ";
+  mortgage = 12*(loanAmount * (loanInterest / 12) * pow((1 + (loanInterest / 12)), (12 * loanTerm))) / (pow((1 + (loanInterest / 12)), (12 * loanTerm)) - 1);
+
+  std::cout << "Enter the property tax rate on the home: ";
   std::cin >> taxes;
+  homeTax = taxes*price;
+
+  float maintenance = 0.01 * price;
 
   std::cout << "Enter the rate at which you expect your home to appreciate each year:";
   std::cin >> appreciation;
 
+  std::cout << "Enter the expected average yearly inflation rate: ";
+  std::cin >> inflationRate;
+
+  std::cout << "Enter how many years in the future you want to look: ";
+  std::cin >> years;
+
+  float equivalence = homeTax*pow((1 + inflationRate),years);
+
+  float total = equivalence + maintenance + mortgage + downPayment;
+  std::cout << total;
+
 }
+
+
+
+
+
+
+
+
 void CommuteFromHome() {
   double miles;
   int choice;
