@@ -13,9 +13,18 @@
 #include <tgmath.h>
 
 void HomeBuyingInfo();
-void CommuteFromHome();
+double CommuteFromHome();
 void RentingInfo();
-void CommuteFromApartment();
+double CommuteFromApartment();
 void RentVsBuy();
-double modeOfTransportation(int);
+void toFile();
+void invest();
+double modeOfTransportation();
+
+
+
+class commute{
+ public:
+  double cost();
+};
 #endif //RENTVSBUY__RENTVSBUY_H_
