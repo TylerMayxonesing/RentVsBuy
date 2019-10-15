@@ -43,7 +43,7 @@ void HomeBuyingInfo() {
   std::cout << "Enter the rate at which you expect your home to appreciate each year:";
   std::cin >> appreciation;
 
-  int transportation = ceil(CommuteFromHome());
+  int transportation = round(CommuteFromHome());
 
   std::cout << transportation << std::endl;
 
