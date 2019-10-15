@@ -16,9 +16,6 @@ void HomeBuyingInfo();
 double CommuteFromHome();
 void RentingInfo();
 double CommuteFromApartment();
-void RentVsBuy();
-void toFile();
-void invest();
 double modeOfTransportation();
 
 

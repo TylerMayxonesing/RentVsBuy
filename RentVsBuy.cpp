@@ -13,7 +13,7 @@ void HomeBuyingInfo() {
   double taxes;
   double appreciation;
   double propertyTax;
-  int mortgage;
+  double mortgage;
   double totalCost;
   std::cout << "Enter the purchase price of the home: ";
   std::cin >> price;
@@ -29,36 +29,32 @@ void HomeBuyingInfo() {
   std::cout << "Enter the term of your loan: ";
   std::cin >> loanTerm;
 
-  mortgage = 12*(loanAmount * (loanInterest / 12) * pow((1 + (loanInterest / 12)), (12 * loanTerm))) / (pow((1 + (loanInterest / 12)), (12 * loanTerm)) - 1);
-  std::cout << mortgage << std::endl;
+  mortgage = round(12.*(loanAmount * (loanInterest / 12.) * pow((1. + (loanInterest / 12.)), (12. * loanTerm))) / (pow((1. + (loanInterest / 12.)), (12. * loanTerm)) - 1.));
+
 
   std::cout << "Enter the property tax rate on the home: ";
   std::cin >> propertyTax;
   taxes = propertyTax*price;
-  std::cout << "Taxes: " << taxes << std::endl;
 
-  float maintenance = (0.01 * price);
-  std::cout << "Maintenance: " << maintenance << std::endl;
 
-  std::cout << "Enter the rate at which you expect your home to appreciate each year:";
+  double maintenance = 0.01 * price;
+
+
+  std::cout << "Enter the rate at which you expect your home to appreciate each year: ";
   std::cin >> appreciation;
 
-  int transportation = ceil(CommuteFromHome());
+  double realTax = propertyTax*price*pow(1+(appreciation/12),0);
 
-  std::cout << transportation << std::endl;
+  double transportation = round(CommuteFromHome());
+
+
 
   totalCost = maintenance + mortgage + downPayment + transportation + taxes;
 
-  std::cout << "Home Costs Total: " << totalCost;
-}
-double CommuteFromHome() {
-  double miles;
-  double cost;
-  std::cout << "Enter how many miles from work your home is: ";
-  std::cin >> miles;
-  double mpg = modeOfTransportation();
-  cost = mpg * miles*2*261;
-  return cost;
+  double homeValueReal = downPayment*pow((1 + appreciation/12),12);
+
+  std::cout << "Mortgage,Taxes(real),Home Transportation(real),Home Maintenance(real),Home Costs Total(real),Home Value(real)\n"
+               <<mortgage<<","<<realTax<<","<<transportation<<","<<maintenance<<","<<totalCost << "," << homeValueReal << std::endl;
 }
 
 
@@ -73,11 +69,21 @@ void RentingInfo() {
   std::cout << "Enter your expected annual average rate of return on your investments: ";
   std:: cin >> returnRate;
 
-  int transportation = ceil(CommuteFromApartment());
+  double transportation = round(CommuteFromApartment());
 
   int total = monthlyRent*12 + returnRate + transportation;
 
   std::cout << "Total: " << total;
+}
+
+double CommuteFromHome() {
+  double miles;
+  double cost;
+  std::cout << "Enter how many miles from work your home is: ";
+  std::cin >> miles;
+  double mpg = modeOfTransportation();
+  cost = mpg * miles*2*261;
+  return cost;
 }
 
 double CommuteFromApartment() {
