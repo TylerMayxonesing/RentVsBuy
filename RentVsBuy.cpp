@@ -49,12 +49,12 @@ void HomeBuyingInfo() {
 
 
 
-  totalCost = maintenance + mortgage + downPayment + transportation + taxes;
+  totalCost = round(maintenance + mortgage + downPayment + transportation + taxes - downPayment);
 
   double homeValueReal = downPayment*pow((1 + appreciation/12),12);
 
   std::cout << "Mortgage,Taxes(real),Home Transportation(real),Home Maintenance(real),Home Costs Total(real),Home Value(real)\n"
-            <<round(mortgage)<<","<<round(realTax)<<","<<round(transportation)<<","<<round(maintenance)<<","<<round(totalCost)<< "," << homeValueReal << std::endl;
+               <<round(mortgage)<<","<<round(realTax)<<","<<transportation<<","<<round(maintenance)<<","<<totalCost << "," << homeValueReal << std::endl;
 }
 
 
@@ -69,7 +69,7 @@ void RentingInfo() {
   std::cout << "Enter your expected annual average rate of return on your investments: ";
   std:: cin >> returnRate;
 
-  double transportation = CommuteFromApartment();
+  double transportation = round(CommuteFromApartment());
 
   int total = monthlyRent*12 + returnRate + transportation;
 
