@@ -17,11 +17,8 @@ double CommuteFromHome();
 void RentingInfo();
 double CommuteFromApartment();
 double modeOfTransportation();
+void RentVsBuy();
 
 
 
-class commute{
- public:
-  double cost();
-};
 #endif //RENTVSBUY__RENTVSBUY_H_

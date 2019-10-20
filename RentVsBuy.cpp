@@ -16,18 +16,6 @@ void HomeBuyingInfo() {
   double mortgage;
   double totalCost;
 
-
-
-
-
-
-
-
-
-
-
-
-
   std::cout << "Enter the purchase price of the home: ";
   std::cin >> homeValue;
 
@@ -35,8 +23,6 @@ void HomeBuyingInfo() {
   std::cin >> downPayment;
 
   loanAmount = homeValue - downPayment;
-
-
 
   std::cout << "Enter the interest rate on your loan: ";
   std::cin >> loanInterest;
@@ -51,7 +37,6 @@ void HomeBuyingInfo() {
   std::cin >> propertyTax;
   taxes = propertyTax*homeValue;
 
-
   double maintenance = 0.01 * homeValue;
 
 
@@ -61,7 +46,6 @@ void HomeBuyingInfo() {
   double realTax = propertyTax*homeValue*pow(1+(appreciation/12),0);
 
   double transportation = CommuteFromHome();
-
 
 
   totalCost = maintenance + mortgage + downPayment + transportation + taxes - downPayment;
@@ -89,53 +73,26 @@ void HomeBuyingInfo() {
 
 
 
-
-
-
-
-
-
-
-
 void RentingInfo() {
   double monthlyRent;
   double returnRate;
-
-  std::cout << "Enter your monthly rent payment: ";
-  std::cin >> monthlyRent;
-  std::cout << "Rental: " << monthlyRent*12 << std::endl;
-
-  std::cout << "Enter your expected annual average rate of return on your investments: ";
-  std:: cin >> returnRate;
-
-  double transportation = round(CommuteFromApartment());
-
-  int total = monthlyRent*12 + returnRate + transportation;
-
-  std::cout << "Total: " << total;
-}
-
-double CommuteFromHome() {
-  double miles;
-  double cost;
-  std::cout << "Enter how many miles from work your home is: ";
-  std::cin >> miles;
-  double mpg = modeOfTransportation();
-  cost = mpg * miles*2*261;
-  return cost;
-}
-
-double CommuteFromApartment() {
-  double miles;
-  double cost;
+  double transportation;
+  double totalCost;
+  double yearlyRent;
+  double yearlyTransportation;
   double inflationRate;
   double years;
 
-  std::cout << "Enter how many miles from work your apartment is: ";
-  std::cin >> miles;
-  double mpg = modeOfTransportation();
 
-  cost = mpg * 12;
+
+  std::cout << "Enter your monthly rent payment: ";
+  std::cin >> monthlyRent;
+  yearlyRent = 12. * monthlyRent;
+
+  std::cout << "Enter your expected annual average rate of return on your investments: ";
+  std::cin >> returnRate;
+
+  transportation = round(CommuteFromApartment());
 
   std::cout << "Enter the expected average yearly inflation rate: ";
   std::cin >> inflationRate;
@@ -143,7 +100,45 @@ double CommuteFromApartment() {
   std::cout << "Enter how many years in the future you want to look: ";
   std::cin >> years;
 
-  return cost;
+  //std::cout << "Rent(real), Rent Transportation(real), Rent Costs Total (real)" << std::endl;
+  for (int i = 1; i <= 12; i++) {
+    totalCost = transportation*pow(1 + (inflationRate / 12), 12 * i)+ yearlyRent * pow(1 + inflationRate / 12, 12 * i);
+  }
+    std::cout << "Rent(real): " << round(yearlyRent) << ", "<< "Rent Transportation (real): " << transportation <<
+    ", " << "Rent Costs Total: "<< round(totalCost)<< std::endl;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+double CommuteFromHome() {
+  double miles;
+  double transportationCost;
+  std::cout << "Enter how many miles from work your home is: ";
+  std::cin >> miles;
+  std::cout << "How will you be getting to work from your home?\n";
+  transportationCost = modeOfTransportation()*miles;
+  return transportationCost;
+}
+
+double CommuteFromApartment() {
+  double miles;
+  double transportationCost;
+
+  std::cout << "Enter how many miles from work your apartment is: ";
+  std::cin >> miles;
+  std::cout << "How will you be getting to work from your apartment?\n";
+  transportationCost = modeOfTransportation();
+
+  return transportationCost;
 }
 
 
@@ -151,8 +146,8 @@ double CommuteFromApartment() {
 double modeOfTransportation() {
   int choice;
   double cost;
-  std::cout << "How will you be getting to work from your apartment?\n"
-               "Enter 1 for driving.\n"
+  double transportationCost;
+  std::cout <<"Enter 1 for driving.\n"
                "Enter 2 for public transit.\n"
                "Enter 3 for biking, walking, etc.\n"
                "Enter your choice: ";
@@ -160,15 +155,19 @@ double modeOfTransportation() {
   if (choice == 1){
     std::cout << "Enter how much it costs to drive your car per mile: ";
     std::cin >> cost;
+    transportationCost = 261.*2.*cost;
   }
   if (choice == 2){
     std::cout << "Enter your monthly public transit costs: ";
     std::cin >> cost;
+    transportationCost = 12.*cost;
   }
   if (choice == 3){
     cost = 0;
+    transportationCost = 0;
   }
 
-  return cost;
+
+  return transportationCost;
 
 }
