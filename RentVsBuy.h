@@ -12,12 +12,12 @@
 #include <iomanip>
 #include <tgmath.h>
 
-void HomeBuyingInfo();
+std::vector<double> HomeBuyingInfo();
 double CommuteFromHome();
 void RentingInfo();
 double CommuteFromApartment();
 double modeOfTransportation();
-void RentVsBuy();
+void RunRentVsBuy();
 
 
 
