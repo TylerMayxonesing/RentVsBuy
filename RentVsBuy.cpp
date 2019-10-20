@@ -5,7 +5,7 @@
 #include "RentVsBuy.h"
 
 void HomeBuyingInfo() {
-  double price;
+  double homeValue;
   double downPayment;
   double loanAmount;
   double loanInterest;
@@ -15,13 +15,28 @@ void HomeBuyingInfo() {
   double propertyTax;
   double mortgage;
   double totalCost;
+
+
+
+
+
+
+
+
+
+
+
+
+
   std::cout << "Enter the purchase price of the home: ";
-  std::cin >> price;
+  std::cin >> homeValue;
 
   std::cout << "Enter your down payment: ";
   std::cin >> downPayment;
 
-  loanAmount = price - downPayment;
+  loanAmount = homeValue - downPayment;
+
+
 
   std::cout << "Enter the interest rate on your loan: ";
   std::cin >> loanInterest;
@@ -34,28 +49,52 @@ void HomeBuyingInfo() {
 
   std::cout << "Enter the property tax rate on the home: ";
   std::cin >> propertyTax;
-  taxes = propertyTax*price;
+  taxes = propertyTax*homeValue;
 
 
-  double maintenance = 0.01 * price;
+  double maintenance = 0.01 * homeValue;
 
 
   std::cout << "Enter the rate at which you expect your home to appreciate each year: ";
   std::cin >> appreciation;
 
-  double realTax = propertyTax*price*pow(1+(appreciation/12),0);
+  double realTax = propertyTax*homeValue*pow(1+(appreciation/12),0);
 
   double transportation = CommuteFromHome();
 
 
 
-  totalCost = round(maintenance + mortgage + downPayment + transportation + taxes - downPayment);
+  totalCost = maintenance + mortgage + downPayment + transportation + taxes - downPayment;
+  for (int i = 1; i <= 12; i++) {
+    loanAmount = loanAmount*(1+loanInterest/12);
+    loanAmount = loanAmount - (mortgage/12);
+    homeValue = homeValue*((appreciation/12)+1);
 
-  double homeValueReal = downPayment*pow((1 + appreciation/12),12);
+  }
+  double realHomeValue = homeValue - loanAmount;
+
 
   std::cout << "Mortgage,Taxes(real),Home Transportation(real),Home Maintenance(real),Home Costs Total(real),Home Value(real)\n"
-               <<round(mortgage)<<","<<round(realTax)<<","<<transportation<<","<<round(maintenance)<<","<<totalCost << "," << homeValueReal << std::endl;
+               <<round(mortgage)<<","<<round(realTax)<<","<<round(transportation)<<","<<round(maintenance)<<","<<round(totalCost) << "," << round (realHomeValue) << std::endl;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 void RentingInfo() {
