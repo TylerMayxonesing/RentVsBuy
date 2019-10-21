@@ -11,6 +11,8 @@
 #include <cmath>
 #include <iomanip>
 #include <tgmath.h>
+#include <fstream>
+
 
 std::vector<double> HomeBuyingInfo();
 std::vector<double> HomeBuyingCalculations(double,double,double,double,double,double,double,double);

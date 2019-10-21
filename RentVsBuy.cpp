@@ -112,6 +112,8 @@ std::vector<double> HomeBuyingCalculations(double transportation,double homeValu
 }
 
 void RunRentVsBuy(){
+  std::ofstream outputFile;
+  outputFile.open("RentVsBuy.csv");
   std::vector <double> home;
   std::vector <double> rent;
   std::vector <double> homeInvestment;
@@ -140,18 +142,22 @@ void RunRentVsBuy(){
 //      std::cout << rent.at(j)<<",";
 //    }
 
+
       std::cout << homeInvestment.at(0);
 
     std::cout << "\n";
   }
+  outputFile.close();
 }
 
 std::vector<double> homeInvestmentCalc(double yearlyRent, double currentYearTotal, double inflation, double investmentRate, double years){
   double diff;
   double contribution;
-  double homeinvestPerMonth;
+  double homeinvestPerMonth =0;
   double homeinvest;
   std::vector<double> investment;
+
+
   if (yearlyRent > currentYearTotal) {
     diff = yearlyRent - currentYearTotal;
     contribution = diff / 12;
@@ -159,21 +165,20 @@ std::vector<double> homeInvestmentCalc(double yearlyRent, double currentYearTota
       for (int i = 1; i <= 12; i++) {
         homeinvestPerMonth += contribution;
         homeinvestPerMonth *= (1 + investmentRate / 12);
+      }}
+      //  else {homeinvestPerMonth = 10;}
+
+      for (int j = 1; j <= years; j++) {
+      if (j==1){
+        homeinvest = homeinvestPerMonth;
       }
-    }
-  }
-  else (homeinvestPerMonth = 0);
 
-  for (int j = 1; j <= years; j++) {
-    if (j==1){
-      homeinvest = homeinvestPerMonth;
-    if (j>1){
-      homeinvest = homeinvest* (pow(1+investmentRate/12,j-1))/(1+inflation) + homeinvestPerMonth;
-
+      if (j>1){
+        homeinvest = (homeinvest *(pow(1+investmentRate/12,12))/(1+inflation)) + homeinvestPerMonth;
+      }
     }
       investment.push_back(homeinvest);
     }
-  }
   return investment;
 }
 
