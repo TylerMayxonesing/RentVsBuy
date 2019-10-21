@@ -4,20 +4,17 @@
 
 #include "RentVsBuy.h"
 
-std::vector<double> HomeBuyingInfo(int k) {
+std::vector<double> HomeBuyingInfo(){
   double homeValue;
   double downPayment;
-  double loanAmount;
+  double transportation;
   double loanInterest;
   double loanTerm;
-  double taxes;
   double appreciation;
   double propertyTax;
-  double mortgage;
-  double totalCost;
-  double realHomeValue;
+  double loanAmount;
 
-  std::vector <double> home;
+  std::vector <double> values;
   std::cout << "Enter the purchase price of the home: ";
   std::cin >> homeValue;
 
@@ -32,74 +29,82 @@ std::vector<double> HomeBuyingInfo(int k) {
   std::cout << "Enter the term of your loan: ";
   std::cin >> loanTerm;
 
-  mortgage = 12.*(loanAmount * (loanInterest / 12.) * pow((1. + (loanInterest / 12.)), (12. * loanTerm))) / (pow((1. + (loanInterest / 12.)), (12. * loanTerm)) - 1.);
-  home.push_back(mortgage);
-
-
   std::cout << "Enter the property tax rate on the home: ";
   std::cin >> propertyTax;
-  taxes = propertyTax*homeValue;
-
-  double maintenance = 0.01 * homeValue;
-
 
   std::cout << "Enter the rate at which you expect your home to appreciate each year: ";
   std::cin >> appreciation;
 
-  double realTax = propertyTax*homeValue*pow(1+(appreciation/12),0);
-  home.push_back(realTax);
+  transportation = CommuteFromHome();
 
-  double transportation = CommuteFromHome();
-  home.push_back(transportation);
-  home.push_back(maintenance);
+  values.push_back(transportation);
+  values.push_back(homeValue);
+  values.push_back(loanInterest);
+  values.push_back(loanTerm);
+  values.push_back(appreciation);
+  values.push_back(propertyTax);
+  values.push_back(loanAmount);
+
+  return values;
+
+}
+
+
+std::vector<double> HomeBuyingCalculations(double transportation,double homeValue, double loanInterest,
+    double loanTerm, double appreciation,double propertyTax, double loanAmount, int iterations) {
+
+  std::vector<double> home;
+  double taxes;
+  double realTax;
+  double totalCost;
+  double mortgage;
+  double realHomeValue;
+
+  mortgage = 12.*(loanAmount * (loanInterest / 12.) * pow((1. + (loanInterest / 12.)), (12. * loanTerm))) / (pow((1. + (loanInterest / 12.)), (12. * loanTerm)) - 1.);
+  taxes = propertyTax*homeValue;
+  double maintenance = 0.01 * homeValue;
+  double purchasePrice = homeValue;
 
   totalCost = maintenance + mortgage + transportation + taxes;
+  home.push_back(mortgage);
+  home.push_back(0);
+  home.push_back(transportation);
+  home.push_back(maintenance);
   home.push_back(totalCost);
   home.push_back(0);
-  home.push_back(0);
 
-  for (int j = 1; j <= k; j++) {
-    for (int i = 1; i < 13; i++) {
+  for (int j = 1; j <= iterations; j++) {
+    realTax = (purchasePrice * pow (1 + (appreciation / 12) , 12 * (j - 1)) * propertyTax)/ (pow(1+(0.035),j-1));
+    for (int i = 1; i <= 12; i++) {
       loanAmount = loanAmount * (1. + (loanInterest / 12.));
       loanAmount = loanAmount - (mortgage / 12.);
       homeValue = homeValue * (1. + (appreciation / 12.));
     }
+    home.at(1) = realTax;
     double nominal = homeValue - loanAmount;
     realHomeValue = nominal / (pow(1+(0.035),j-1));
-    //std::cout << realHomeValue << std::endl;
-
     home.at(5) = realHomeValue;
-
-//    for (int k = 0; k < 5; k++){
-//      std::cout << home.at(5) << std::endl;
-//    }
-
-    //home.push_back(round(mortgage));
-    //home.push_back(round(realTax));
-    //home.push_back(round(transportation));
-    //home.push_back(round(maintenance));
-    //home.push_back(round(totalCost));
-    //home.push_back(round(homeValue));
-    //home.push_back(realHomeValue);
   }
-  //std::cout<<home.at(5);
+  //std::cout<<"RealHomeValue: " << home.at(5) << std::endl;
+  //std::cout<<"RealTax: " << home.at(1) << std::endl;
+
   return home;
 }
 
-
 void RunRentVsBuy(){
   std::vector <double> home;
+  std::vector<double> homeValues = HomeBuyingInfo();
+
   for (int years = 1; years < 50; years++) {
-    home = HomeBuyingInfo(years);
-    //std::cout << "Mortgage: Taxes(real): HomeTransportation: HomeCosts: HomeValue: \n";
+  home = HomeBuyingCalculations(homeValues.at(0), homeValues.at(1), homeValues.at(2), homeValues.at(3), homeValues.at(4),
+      homeValues.at(5), homeValues.at(6), years);
+
     for (int i = 0; i < 6; i++) {
-      std::cout << home.at(i);
+      std::cout << home.at(i)<<",";
     }
+    std::cout << "\n";
   }
 }
-
-
-
 
 
 
