@@ -100,7 +100,8 @@ void RunRentVsBuy(){
 
   int loanTerm = int(homeValues.at(7));
   int time = int(rentValues.at(0));
-  std::cout << "Year,Mortgage,Taxes(real),Home Transportation(real),Home Maintenance(real),Home Costs Total(real),Home Value(real)"<<std::endl;
+  std::cout << "Year,Mortgage,Taxes(real),Home Transportation(real),Home Maintenance(real),Home Costs Total(real),Home Value(real), "
+               "Rent(real), RentTransportation, RentCost"<<std::endl;
 
 
   for (int years = 1; years <= loanTerm; years++) {
