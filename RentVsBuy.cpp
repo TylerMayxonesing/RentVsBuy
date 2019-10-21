@@ -4,7 +4,7 @@
 
 #include "RentVsBuy.h"
 
-std::vector <double> HomeBuyingInfo() {
+std::vector<double> HomeBuyingInfo(int k) {
   double homeValue;
   double downPayment;
   double loanAmount;
@@ -18,7 +18,6 @@ std::vector <double> HomeBuyingInfo() {
   double realHomeValue;
 
   std::vector <double> home;
-
   std::cout << "Enter the purchase price of the home: ";
   std::cin >> homeValue;
 
@@ -34,6 +33,7 @@ std::vector <double> HomeBuyingInfo() {
   std::cin >> loanTerm;
 
   mortgage = 12.*(loanAmount * (loanInterest / 12.) * pow((1. + (loanInterest / 12.)), (12. * loanTerm))) / (pow((1. + (loanInterest / 12.)), (12. * loanTerm)) - 1.);
+  home.push_back(mortgage);
 
 
   std::cout << "Enter the property tax rate on the home: ";
@@ -47,49 +47,55 @@ std::vector <double> HomeBuyingInfo() {
   std::cin >> appreciation;
 
   double realTax = propertyTax*homeValue*pow(1+(appreciation/12),0);
+  home.push_back(realTax);
 
   double transportation = CommuteFromHome();
+  home.push_back(transportation);
+  home.push_back(maintenance);
 
+  totalCost = maintenance + mortgage + transportation + taxes;
+  home.push_back(totalCost);
+  home.push_back(0);
+  home.push_back(0);
 
-  for (int j = 1; j <= 30; j++) {
+  for (int j = 1; j <= k; j++) {
     for (int i = 1; i < 13; i++) {
       loanAmount = loanAmount * (1. + (loanInterest / 12.));
       loanAmount = loanAmount - (mortgage / 12.);
       homeValue = homeValue * (1. + (appreciation / 12.));
     }
-    homeValue = homeValue - loanAmount;
-    realHomeValue = homeValue / (pow(1+(0.035),j-1));
+    double nominal = homeValue - loanAmount;
+    realHomeValue = nominal / (pow(1+(0.035),j-1));
+    //std::cout << realHomeValue << std::endl;
 
+    home.at(5) = realHomeValue;
 
-    totalCost = maintenance + mortgage + transportation + taxes;
+//    for (int k = 0; k < 5; k++){
+//      std::cout << home.at(5) << std::endl;
+//    }
 
-
-    home.push_back(round(mortgage));
-    home.push_back(round(realTax));
-    home.push_back(round(transportation));
-    home.push_back(round(maintenance));
-    home.push_back(round(totalCost));
-    home.push_back(round(homeValue));
-    home.push_back(realHomeValue);
-    }
-
-
+    //home.push_back(round(mortgage));
+    //home.push_back(round(realTax));
+    //home.push_back(round(transportation));
+    //home.push_back(round(maintenance));
+    //home.push_back(round(totalCost));
+    //home.push_back(round(homeValue));
+    //home.push_back(realHomeValue);
+  }
+  //std::cout<<home.at(5);
   return home;
 }
 
 
 void RunRentVsBuy(){
   std::vector <double> home;
-  for (int years = 0; years < 50; years++)
-  home = HomeBuyingInfo();
-
-  std::cout << "Mortgage: Taxes(real): HomeTransportation: HomeCosts: HomeValue: \n";
-  for (int i =0; i < 7; i++){
-    std::cout << home.at (i);
+  for (int years = 1; years < 50; years++) {
+    home = HomeBuyingInfo(years);
+    //std::cout << "Mortgage: Taxes(real): HomeTransportation: HomeCosts: HomeValue: \n";
+    for (int i = 0; i < 6; i++) {
+      std::cout << home.at(i);
+    }
   }
-
-
-
 }
 
 
@@ -129,8 +135,8 @@ void RentingInfo() {
   for (int i = 1; i <= 12; i++) {
     totalCost = transportation*pow(1 + (inflationRate / 12), 12 * i)+ yearlyRent * pow(1 + inflationRate / 12, 12 * i);
   }
-    std::cout << "Rent(real): " << round(yearlyRent) << ", "<< "Rent Transportation (real): " << transportation <<
-    ", " << "Rent Costs Total: "<< round(totalCost)<< std::endl;
+  std::cout << "Rent(real): " << round(yearlyRent) << ", "<< "Rent Transportation (real): " << transportation <<
+            ", " << "Rent Costs Total: "<< round(totalCost)<< std::endl;
 
 }
 
@@ -173,9 +179,9 @@ double modeOfTransportation() {
   double cost;
   double transportationCost;
   std::cout <<"Enter 1 for driving.\n"
-               "Enter 2 for public transit.\n"
-               "Enter 3 for biking, walking, etc.\n"
-               "Enter your choice: ";
+              "Enter 2 for public transit.\n"
+              "Enter 3 for biking, walking, etc.\n"
+              "Enter your choice: ";
   std::cin >> choice;
   if (choice == 1){
     std::cout << "Enter how much it costs to drive your car per mile: ";
@@ -196,3 +202,4 @@ double modeOfTransportation() {
   return transportationCost;
 
 }
+

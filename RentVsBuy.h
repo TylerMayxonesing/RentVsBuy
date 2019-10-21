@@ -12,7 +12,7 @@
 #include <iomanip>
 #include <tgmath.h>
 
-std::vector<double> HomeBuyingInfo();
+std::vector<double> HomeBuyingInfo(int k);
 double CommuteFromHome();
 void RentingInfo();
 double CommuteFromApartment();
