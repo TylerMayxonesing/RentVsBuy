@@ -15,9 +15,13 @@
 std::vector<double> HomeBuyingInfo();
 std::vector<double> HomeBuyingCalculations(double,double,double,double,double,double,double,double);
 double CommuteFromHome();
-void RentingInfo();
+
+
+std::vector<double> RentingInfo();
 double CommuteFromApartment();
+std::vector<double> RentingCalculations(double, double, double);
 double modeOfTransportation();
+
 void RunRentVsBuy();
 
 
