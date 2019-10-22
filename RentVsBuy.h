@@ -20,7 +20,7 @@ double CommuteFromApartment();
 std::vector<double> RentingCalculations(double, double, double);
 double modeOfTransportation();
 
-std::vector<double> homeInvestmentCalc(double, double, double, double, double);
+std::vector<double> homeInvestmentCalc(double, double, double, double, double, double);
 
 
 void RunRentVsBuy();
