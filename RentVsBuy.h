@@ -11,7 +11,7 @@
 
 
 std::vector<double> HomeBuyingInfo();
-std::vector<double> HomeBuyingCalculations(double,double,double,double,double,double,double,double);
+std::vector<double> HomeBuyingCalculations(double,double,double,double,double,double,double,double, double, double);
 double CommuteFromHome();
 
 

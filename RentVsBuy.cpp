@@ -40,7 +40,6 @@ std::vector<double> HomeBuyingInfo(){
     values.push_back(appreciation);
     values.push_back(propertyTax);
     values.push_back(loanAmount);
-    values.push_back(loanTerm);
     values.push_back(downPayment);
 
     return values;
@@ -49,7 +48,7 @@ std::vector<double> HomeBuyingInfo(){
 
 
 std::vector<double> HomeBuyingCalculations(double transportation,double homeValue, double loanInterest,
-                                           double loanTerm, double appreciation,double propertyTax, double loanAmount, int iterations) {
+                                           double loanTerm, double appreciation,double propertyTax, double loanAmount, int years, double last_year_home_cost, double last_year_home_value) {
 
     std::vector<double> home;
     double taxes;
@@ -61,6 +60,9 @@ std::vector<double> HomeBuyingCalculations(double transportation,double homeValu
 
 
     mortgage = 12.*(loanAmount * (loanInterest / 12.) * pow((1. + (loanInterest / 12.)), (12. * loanTerm))) / (pow((1. + (loanInterest / 12.)), (12. * loanTerm)) - 1.);
+    if (years > loanTerm){
+        mortgage = 0;
+    }
     taxes = propertyTax*homeValue;
     double maintenance = 0.01 * homeValue;
     double purchasePrice = homeValue;
@@ -72,26 +74,32 @@ std::vector<double> HomeBuyingCalculations(double transportation,double homeValu
     home.push_back(0);
     home.push_back(0);
     home.push_back(0);
-
-    for (int j = 1; j <= iterations; j++) {
+    for (int j = 1; j <= years; j++) {
         realTax = (taxes* pow (1 + (appreciation / 12) , 12 * (j - 1)))/ (pow(1+(0.035),j-1));
+
         for (int i = 1; i <= 12; i++) {
             loanAmount = loanAmount * (1. + (loanInterest / 12.));
             loanAmount = loanAmount - (mortgage / 12.);
             homeValue = homeValue * (1. + (appreciation / 12.));
         }
-        home.at(1) = round(realTax);
-        totalCost = totalCost + maintenance + transportation + realTax + (mortgage / (pow((1. + (loanInterest)), j - 1.)));
+        home.at(1) = realTax;
+        if (j <31){
+            totalCost = totalCost + maintenance + transportation + realTax +
+                        (mortgage / (pow((1. + (loanInterest)), j - 1.)));
+
+        }
+
+        else {
+            totalCost = last_year_home_cost  + maintenance + transportation + realTax ;}
+
         currentYearTotal = maintenance + transportation + realTax + (mortgage / (pow((1. + (loanInterest)), j - 1.)));
 
         home.at(6) = currentYearTotal;
-        home.at(4) = round(totalCost);
+        home.at(4) = totalCost;
         double nominal = homeValue - loanAmount;
         realHomeValue = nominal / (pow(1+(0.035),j-1));
-        home.at(5) = round(realHomeValue);
+        home.at(5) = realHomeValue;
     }
-
-
     //std::cout<<"RealHomeValue: " << home.at(5) << std::endl;
     //std::cout<<"RealTax: " << home.at(1) << std::endl;
     return home;
@@ -103,33 +111,87 @@ void RunRentVsBuy(){
     std::vector <double> home;
     std::vector <double> rent;
     std::vector <double> homeInvestment;
-    std::vector <double> RentInvestment;
+    std::vector <double> rentInvestment;
 
     std::vector<double> homeValues = HomeBuyingInfo();
     std::vector<double> rentValues = RentingInfo();
-    double last_year_value_home =0;
-    double last_year_value_rent =0;
+    double last_year_value = 0;
+    double last_year_home_value = 0;
+    double last_year_value_rent = 0;
+    double last_year_home_cost =0;
+    double homeProfit;
+    double homeGross;
+    double rentGross;
+    double difference;
 
-    int loanTerm = int(homeValues.at(7));
-    int time = int(rentValues.at(0));
+    double homeTransportation = homeValues.at(0);
+    double homeValue = homeValues.at(1);
+    double loanInterest = homeValues.at(2);
+    double loanTerm = homeValues.at(3);
+    double appreciation = homeValues.at(4);
+    double propertyTax = homeValues.at(5);
+    double loanAmount = homeValues.at(6);
+    double downPayment = homeValues.at(7);
+
+    double rentYears = rentValues.at(0);
+    double yearlyRent = rentValues.at(1);
+    double rentTransportation = rentValues.at(2);
+    double inflation = rentValues.at(3);
+    double returnRate = rentValues.at(4);
+
+
+
     std::cout << "Year,Mortgage,Taxes(real),Home Transportation(real),Home Maintenance(real),Home Costs Total(real),Home Value(real), "
                  "Rent(real), RentTransportation, RentCost"<<std::endl;
 
 
-    for (int years = 1; years <= loanTerm; years++) {
-        home = HomeBuyingCalculations(homeValues.at(0), homeValues.at(1), homeValues.at(2), homeValues.at(3), homeValues.at(4),
-                                      homeValues.at(5), homeValues.at(6), years);
-        rent = RentingCalculations(years, rentValues.at(1), rentValues.at(2));
-        RentInvestment = rentInvestmentCalc(rent.at(1), home.at(6), rentValues.at(3), rentValues.at(4),years, last_year_value_rent, homeValues.at(8));
-        homeInvestment = homeInvestmentCalc(rent.at(1), home.at(6), rentValues.at(3), rentValues.at(4),years, last_year_value_home);
+    for (int years = 1; years <= rentYears; years++) {
+
+        home = HomeBuyingCalculations(homeTransportation, homeValue, loanInterest, loanTerm, appreciation,
+                                      propertyTax, loanAmount, years, last_year_home_cost, last_year_home_value);
+        rent = RentingCalculations(years, yearlyRent, rentTransportation);
+
+        homeInvestment = homeInvestmentCalc(rent.at(1), home.at(6), inflation, returnRate,years, last_year_value);
+        rentInvestment = rentInvestmentCalc(rent.at(1), home.at(6), inflation, returnRate,years, last_year_value_rent, downPayment);
+
+
         std::cout << years <<", ";
 
+        std::cout << "Home Values: ";
+        for (int i = 0; i < 6; i++) {
+            std::cout << home.at(i)<<", ";
+        }
+        std::cout << "Investment Values: ";
+        std::cout << round(homeInvestment.at(0)) << ", ";
+        homeProfit = homeInvestment.at(0) + home.at(5);
+        std::cout << "( " << round (homeProfit) << " )";
+        homeGross = homeProfit - home.at(4);
+        std::cout << homeGross << ", ";
 
+        std::cout << "Rent Values: ";
+        std::cout << yearlyRent << ", ";
+        std::cout << rentTransportation << ", ";
 
-//        std::cout << homeInvestment.at(0);
-        last_year_value_home = homeInvestment.at(0);
-        std::cout << RentInvestment.at(0);
-        last_year_value_rent = RentInvestment.at(0);
+        std::cout << rent.at(0)<<", ";
+        std::cout << "Rent Investment: ";
+        std::cout << round(rentInvestment.at(0))<< ", ";
+        std::cout << rentInvestment.at(0);
+
+        rentGross = rentInvestment.at(0) - rent.at(0);
+        std::cout << round(rentGross)<< ", ";
+
+        difference = homeGross - rentGross;
+        if (difference > 0){
+            std::cout << "Owning";
+        }
+        else {
+            std::cout << "Renting";
+        }
+
+        last_year_home_cost = home.at(4);
+        last_year_home_value = home.at(5);
+        std::cout<<last_year_home_value<<std::endl;
+        last_year_value = homeInvestment.at(0);
 
 
         std::cout << "\n";
@@ -137,18 +199,18 @@ void RunRentVsBuy(){
     outputFile.close();
 }
 
-std::vector<double> homeInvestmentCalc( double yearlyRent, double currentYearTotal, double inflation, double investmentRate, double years, double last_year_value){
+std::vector<double> homeInvestmentCalc( double yearlyRentDifference, double yearlyHomeDifference, double inflation, double investmentRate, double years, double last_year_value){
     double diff;
     double contribution;
-    double homeinvestPerMonth =0;
+    double homeinvestPerMonth = 0;
     double homeinvest;
     double first_year;
     std::vector<double> investValues;
     std::vector<double> investment;
-    yearlyRent = 15840;
+    yearlyRentDifference = 15840;
 
-    if (yearlyRent > currentYearTotal) {
-        diff = yearlyRent - currentYearTotal;
+    if (yearlyRentDifference > yearlyHomeDifference) {
+        diff = yearlyRentDifference - yearlyHomeDifference;
 
         contribution = diff / 12;
         for (int i = 1; i <= 12; i++) {
@@ -157,7 +219,7 @@ std::vector<double> homeInvestmentCalc( double yearlyRent, double currentYearTot
         }
 
     }
-    else {homeinvestPerMonth = 0;}
+    //else {homeinvestPerMonth = 0;}
 
 
     for (int j = 1; j <= years; j++) {
@@ -171,7 +233,7 @@ std::vector<double> homeInvestmentCalc( double yearlyRent, double currentYearTot
             homeinvest = (last_year_value*(pow(1+investmentRate/12,12))/(1+inflation)) ;
 
 
-                first_year = homeinvest+homeinvestPerMonth;
+            first_year = homeinvest+homeinvestPerMonth;
 
         }
 
@@ -179,21 +241,21 @@ std::vector<double> homeInvestmentCalc( double yearlyRent, double currentYearTot
 
     }
     investment.push_back(first_year);
-return investment;
+    return investment;
 
 }
 
 std::vector<double> rentInvestmentCalc( double yearlyRent, double currentYearTotal, double inflation, double investmentRate, double years, double last_year_value_home, double downPayment){
     double diff;
     double contribution;
-    double rentinvestPerMonth =0;
+    double rentinvestPerMonth = 0;
     double rentinvest;
     double first_year;
     std::vector<double> investValuesRent;
     std::vector<double> investmentRent;
     yearlyRent = 15840;
 
-    if (currentYearTotal> yearlyRent ) {
+    if (currentYearTotal > yearlyRent ) {
         diff =  currentYearTotal - yearlyRent;
         contribution = diff / 12;
         for (int i = 1; i <= 12; i++) {
@@ -202,7 +264,7 @@ std::vector<double> rentInvestmentCalc( double yearlyRent, double currentYearTot
         }}
     if (yearlyRent>currentYearTotal){
         rentinvestPerMonth = 0;
-}
+    }
 
     for (int j = 1; j <= years; j++) {
         if (j==1){
@@ -225,7 +287,6 @@ std::vector<double> rentInvestmentCalc( double yearlyRent, double currentYearTot
 }
 
 
-
 std::vector<double> RentingInfo() {
     double monthlyRent;
     double returnRate;
@@ -238,7 +299,7 @@ std::vector<double> RentingInfo() {
 
     std::cout << "Enter your monthly rent payment: ";
     std::cin >> monthlyRent;
-    yearlyRent = 12 * monthlyRent +transportation;
+    yearlyRent = (12 * monthlyRent);
 
     std::cout << "Enter your expected annual average rate of return on your investments: ";
     std::cin >> returnRate;
@@ -264,11 +325,11 @@ std::vector<double> RentingInfo() {
 std::vector<double> RentingCalculations(double years, double yearlyRent, double transportation){
     double totalCost = 0;
     std::vector<double> rent;
-    rent.push_back(yearlyRent);
-    rent.push_back(transportation);
+    //rent.push_back(yearlyRent);
+    //rent.push_back(transportation);
 
     for(int i = 1; i <= years; i++) {
-        totalCost = totalCost +  + yearlyRent;
+        totalCost = totalCost + transportation + yearlyRent;
     }
     rent.push_back(totalCost);
     rent.push_back(transportation + yearlyRent);
