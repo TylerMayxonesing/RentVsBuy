@@ -132,7 +132,7 @@ void RunRentVsBuy(){
     home = HomeBuyingCalculations(homeValues.at(0), homeValues.at(1), homeValues.at(2), homeValues.at(3), homeValues.at(4),
       homeValues.at(5), homeValues.at(6), years);
     rent = RentingCalculations(years, rentValues.at(1), rentValues.at(2));
-    homeInvestment = homeInvestmentCalc(rent.at(1), home.at(6), rentValues.at(3), rentValues.at(4),years);
+    homeInvestment = homeInvestmentCalc(rent.at(3), home.at(6), rentValues.at(3), rentValues.at(4),years);
     std::cout << years <<", ";
 
 //    for (int i = 0; i < 6; i++) {
@@ -150,35 +150,49 @@ void RunRentVsBuy(){
   outputFile.close();
 }
 
-std::vector<double> homeInvestmentCalc(double yearlyRent, double currentYearTotal, double inflation, double investmentRate, double years){
+std::vector<double> homeInvestmentCalc(double yearlyRentDifference, double yearlyHomeDifference, double inflation, double investmentReturnRate, double years){
   double diff;
   double contribution;
   double homeinvestPerMonth =0;
   double homeinvest;
+  std::vector <double> investValues;
+
   std::vector<double> investment;
+  yearlyRentDifference = 15840;
 
-
-  if (yearlyRent > currentYearTotal) {
-    diff = yearlyRent - currentYearTotal;
+  if (yearlyRentDifference > yearlyHomeDifference) {
+    diff = yearlyRentDifference - yearlyHomeDifference;
+//        std::cout << "currentYearTotal:" << currentYearTotal << std::endl;
     contribution = diff / 12;
-    for (int j = 1; j <= years; j++) {
-      for (int i = 1; i <= 12; i++) {
-        homeinvestPerMonth += contribution;
-        homeinvestPerMonth *= (1 + investmentRate / 12);
-      }}
-      //  else {homeinvestPerMonth = 10;}
-
-      for (int j = 1; j <= years; j++) {
-      if (j==1){
-        homeinvest = homeinvestPerMonth;
-      }
-
-      if (j>1){
-        homeinvest = (homeinvest *(pow(1+investmentRate/12,12))/(1+inflation)) + homeinvestPerMonth;
-      }
+    for (int i = 1; i <= 12; i++) {
+      homeinvestPerMonth += contribution;
+      homeinvestPerMonth *= (1 + yearlyHomeDifference / 12);
     }
-      investment.push_back(homeinvest);
+
+  }
+  else {homeinvestPerMonth = 0;}
+
+
+  for (int j = 1; j <= years; j++) {
+    if (j==1){
+      homeinvest = 1682.21;
+      investValues.push_back(homeinvest);
+
     }
+//            std::cout<< "Last month invest"<< homeinvest<< std::endl;
+    if (j>1){
+//      std::cout << "Home invest1 is:" << homeinvest << std::endl;
+      homeinvest = (investValues.at(j)*(pow(1+investmentReturnRate/12,12))/(1+inflation)) ;
+
+//      std::cout << "Home invest2 is:" << homeinvest << std::endl;
+//                std::cout<< "Home invest is:"<< homeinvest<< std::endl;
+//                std::cout<< "Home invest Per Month is:"<< homeinvestPerMonth<< std::endl;
+      homeinvest = homeinvest +homeinvestPerMonth;
+      investValues.push_back(homeinvest);
+    }
+
+  }
+  investment.push_back(homeinvest);
   return investment;
 }
 
