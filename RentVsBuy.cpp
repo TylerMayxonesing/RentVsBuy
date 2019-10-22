@@ -41,6 +41,7 @@ std::vector<double> HomeBuyingInfo(){
     values.push_back(propertyTax);
     values.push_back(loanAmount);
     values.push_back(loanTerm);
+    values.push_back(downPayment);
 
     return values;
 
@@ -91,19 +92,6 @@ std::vector<double> HomeBuyingCalculations(double transportation,double homeValu
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
     //std::cout<<"RealHomeValue: " << home.at(5) << std::endl;
     //std::cout<<"RealTax: " << home.at(1) << std::endl;
     return home;
@@ -115,11 +103,12 @@ void RunRentVsBuy(){
     std::vector <double> home;
     std::vector <double> rent;
     std::vector <double> homeInvestment;
+    std::vector <double> RentInvestment;
 
     std::vector<double> homeValues = HomeBuyingInfo();
     std::vector<double> rentValues = RentingInfo();
-    double last_year_value =0;
-
+    double last_year_value_home =0;
+    double last_year_value_rent =0;
 
     int loanTerm = int(homeValues.at(7));
     int time = int(rentValues.at(0));
@@ -131,13 +120,16 @@ void RunRentVsBuy(){
         home = HomeBuyingCalculations(homeValues.at(0), homeValues.at(1), homeValues.at(2), homeValues.at(3), homeValues.at(4),
                                       homeValues.at(5), homeValues.at(6), years);
         rent = RentingCalculations(years, rentValues.at(1), rentValues.at(2));
-        homeInvestment = homeInvestmentCalc(rent.at(1), home.at(6), rentValues.at(3), rentValues.at(4),years, last_year_value);
+        RentInvestment = rentInvestmentCalc(rent.at(1), home.at(6), rentValues.at(3), rentValues.at(4),years, last_year_value_rent, homeValues.at(8));
+        homeInvestment = homeInvestmentCalc(rent.at(1), home.at(6), rentValues.at(3), rentValues.at(4),years, last_year_value_home);
         std::cout << years <<", ";
 
 
 
-        std::cout << homeInvestment.at(0);
-        last_year_value = homeInvestment.at(0);
+//        std::cout << homeInvestment.at(0);
+        last_year_value_home = homeInvestment.at(0);
+        std::cout << RentInvestment.at(0);
+        last_year_value_rent = RentInvestment.at(0);
 
 
         std::cout << "\n";
@@ -165,7 +157,7 @@ std::vector<double> homeInvestmentCalc( double yearlyRent, double currentYearTot
         }
 
     }
-    //else {homeinvestPerMonth = 0;}
+    else {homeinvestPerMonth = 0;}
 
 
     for (int j = 1; j <= years; j++) {
@@ -190,25 +182,47 @@ std::vector<double> homeInvestmentCalc( double yearlyRent, double currentYearTot
 return investment;
 
 }
-//std::vector<double> rentInvestmentCalc(double yearlyRent, double currentYearTotal, double inflation, double investmentRate, double years){
-//    double diff;
-//    double contribution;
-//    double rentinvestPerMonth =0;
-//    double rentinvest;
-//
-//    std::vector<double> investment;
-//    yearlyRent = 15840;
-//
-//    if (currentYearTotal> yearlyRent) {
-//        diff = currentYearTotal - yearlyRent ;
-////        std::cout << "currentYearTotal:" << currentYearTotal << std::endl;
-//        contribution = diff / 12;
-//        for (int i = 1; i <= 12; i++) {
-//            rentinvestPerMonth += contribution;
-//            rentinvestPerMonth *= (1 + investmentRate / 12);
-//        }
 
+std::vector<double> rentInvestmentCalc( double yearlyRent, double currentYearTotal, double inflation, double investmentRate, double years, double last_year_value_home, double downPayment){
+    double diff;
+    double contribution;
+    double rentinvestPerMonth =0;
+    double rentinvest;
+    double first_year;
+    std::vector<double> investValuesRent;
+    std::vector<double> investmentRent;
+    yearlyRent = 15840;
 
+    if (currentYearTotal> yearlyRent ) {
+        diff =  currentYearTotal - yearlyRent;
+        contribution = diff / 12;
+        for (int i = 1; i <= 12; i++) {
+            rentinvestPerMonth += contribution;
+            rentinvestPerMonth *= (1 + investmentRate / 12);
+        }}
+    if (yearlyRent>currentYearTotal){
+        rentinvestPerMonth = 0;
+}
+
+    for (int j = 1; j <= years; j++) {
+        if (j==1){
+            first_year = downPayment* (pow(1+investmentRate/12,12));
+        }
+
+        if (j>1){
+
+            rentinvest = (last_year_value_home*(pow(1+investmentRate/12,12))/(1+inflation)) ;
+            first_year = rentinvest+rentinvestPerMonth;
+
+        }
+
+        investValuesRent.push_back(first_year);
+
+    }
+    investmentRent.push_back(first_year);
+    return investmentRent;
+
+}
 
 
 
