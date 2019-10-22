@@ -59,23 +59,25 @@ std::vector<double> HomeBuyingCalculations(double transportation,double homeValu
   double currentYearTotal;
 
 
-  mortgage = 12.*(loanAmount * (loanInterest / 12.) * pow((1. + (loanInterest / 12.)), (12. * loanTerm))) / (pow((1. + (loanInterest / 12.)), (12. * loanTerm)) - 1.);
-  if (years > loanTerm){
-    mortgage = 0;
-  }
+    mortgage = 12. * (loanAmount * (loanInterest / 12.) * pow((1. + (loanInterest / 12.)), (12. * loanTerm)))
+        / (pow((1. + (loanInterest / 12.)), (12. * loanTerm)) - 1.);
+
   taxes = propertyTax*homeValue;
   double maintenance = 0.01 * homeValue;
   double purchasePrice = homeValue;
 
-  home.push_back(round(mortgage));
+  home.push_back(mortgage);
   home.push_back(0);
-  home.push_back(round(transportation));
-  home.push_back(round(maintenance));
+  home.push_back(transportation);
+  home.push_back(maintenance);
   home.push_back(0);
   home.push_back(0);
   home.push_back(0);
 
   for (int j = 1; j <= years; j++) {
+    if (j > loanTerm){
+      mortgage = 0;
+    }
     realTax = (taxes* pow (1 + (appreciation / 12) , 12 * (j - 1)))/ (pow(1+(0.035),j-1));
     for (int i = 1; i <= 12; i++) {
       loanAmount = loanAmount * (1. + (loanInterest / 12.));
@@ -87,11 +89,11 @@ std::vector<double> HomeBuyingCalculations(double transportation,double homeValu
     currentYearTotal = maintenance + transportation + realTax + (mortgage / (pow((1. + (loanInterest)), j - 1.)));
 
     home.at(6) = currentYearTotal;
-    home.at(4) = totalCost;
     double nominal = homeValue - loanAmount;
     realHomeValue = nominal / (pow(1+(0.035),j-1));
-    home.at(5) = realHomeValue;
   }
+  home.at(4) = totalCost;
+  home.at(5) = realHomeValue;
   //std::cout<<"RealHomeValue: " << home.at(5) << std::endl;
   //std::cout<<"RealTax: " << home.at(1) << std::endl;
   return home;
@@ -147,14 +149,15 @@ void RunRentVsBuy(){
 
     std::cout << years <<", ";
 
-    std::cout << "Home Values: ";
-    for (int i = 0; i < 6; i++) {
-      std::cout << home.at(i)<<", ";
-    }
+//    std::cout << "Home Values: ";
+//    for (int i = 0; i < 6; i++) {
+//      std::cout << home.at(i)<<", ";
+//    }
+
     std::cout << "Investment Values: ";
     std::cout << round(homeInvestment.at(0)) << ", ";
     homeProfit = homeInvestment.at(0) + home.at(5);
-    std::cout << "( " << round (homeProfit) << " )";
+    std::cout << round (homeProfit) << ", ";
     homeGross = homeProfit - home.at(4);
     std::cout << homeGross << ", ";
 
