@@ -257,6 +257,7 @@ std::vector<double> rentInvestmentCalc( double yearlyRentDifference, double year
 
   if (yearlyHomeDifference> yearlyRentDifference ) {
     diff =  yearlyHomeDifference - yearlyRentDifference;
+
     contribution = diff / 12;
     for (int i = 1; i <= 12; i++) {
       rentinvestPerMonth += contribution;
@@ -269,6 +270,7 @@ std::vector<double> rentInvestmentCalc( double yearlyRentDifference, double year
   for (int j = 1; j <= years; j++) {
     if (j==1){
       first_year = downPayment* (pow(1+investmentRate/12,12));
+      first_year = first_year + rentinvestPerMonth;
     }
 
     if (j>1){
@@ -305,7 +307,7 @@ std::vector<double> RentingInfo() {
   std::cout << "Enter your expected annual average rate of return on your investments: ";
   std::cin >> returnRate;
 
-  transportation = round(CommuteFromApartment());
+  transportation = CommuteFromApartment();
 
   std::cout << "Enter the expected average yearly inflation rate: ";
   std::cin >> inflationRate;
