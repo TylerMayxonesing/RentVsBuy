@@ -11,6 +11,8 @@ std::vector<double> HomeBuyingInfo(){
     double loanAmount;
 
     std::vector <double> values;
+
+    std::cout << "==== Home Buying Information ===="<<std::endl;
     std::cout << "Enter the purchase price of the home: ";
     std::cin >> homeValue;
 
@@ -19,13 +21,13 @@ std::vector<double> HomeBuyingInfo(){
 
     loanAmount = homeValue - downPayment;
 
-    std::cout << "Enter the interest rate on your loan: ";
-    std::cin >> loanInterest;
+    //std::cout << "Enter the interest rate on your loan: ";
+    //std::cin >> loanInterest;
 
-    std::cout << "Enter the term of your loan: ";
-    std::cin >> loanTerm;
+    //std::cout << "Enter the term of your loan: ";
+    //std::cin >> loanTerm;
 
-    std::cout << "Enter the property tax rate on the home: ";
+    std::cout << "Enter the property tax rate of the home: ";
     std::cin >> propertyTax;
 
     std::cout << "Enter the rate at which you expect your home to appreciate each year: ";
@@ -35,8 +37,8 @@ std::vector<double> HomeBuyingInfo(){
 
     values.push_back(transportation);
     values.push_back(homeValue);
-    values.push_back(loanInterest);
-    values.push_back(loanTerm);
+    values.push_back(0);
+    values.push_back(0);
     values.push_back(appreciation);
     values.push_back(propertyTax);
     values.push_back(loanAmount);
@@ -48,19 +50,20 @@ std::vector<double> HomeBuyingInfo(){
 
 
 std::vector<double> HomeBuyingCalculations(double transportation,double homeValue, double loanInterest,
-                                           double loanTerm, double appreciation,double propertyTax, double loanAmount, int years) {
+                                           double loanTerm, double appreciation,double propertyTax, double loanAmount, int years, double mortgage) {
 
     std::vector<double> home;
     double taxes;
     double realTax;
     double totalCost = 0;
-    double mortgage;
+    //double mortgage;
     double realHomeValue;
     double currentYearTotal;
+    double difference;
 
 
-    mortgage = 12. * (loanAmount * (loanInterest / 12.) * pow((1. + (loanInterest / 12.)), (12. * loanTerm)))
-               / (pow((1. + (loanInterest / 12.)), (12. * loanTerm)) - 1.);
+//    mortgage = 12. * (loanAmount * (loanInterest / 12.) * pow((1. + (loanInterest / 12.)), (12. * loanTerm)))
+//               / (pow((1. + (loanInterest / 12.)), (12. * loanTerm)) - 1.);
 
     taxes = propertyTax*homeValue;
     double maintenance = 0.01 * homeValue;
@@ -75,9 +78,7 @@ std::vector<double> HomeBuyingCalculations(double transportation,double homeValu
     home.push_back(0);
 
     for (int j = 1; j <= years; j++) {
-        if (j > loanTerm){
-            mortgage = 0;
-        }
+
         home.at(0) = mortgage;
         realTax = (taxes* pow (1 + (appreciation / 12) , 12 * (j - 1)))/ (pow(1+(0.035),j-1));
         for (int i = 1; i <= 12; i++) {
@@ -88,6 +89,7 @@ std::vector<double> HomeBuyingCalculations(double transportation,double homeValu
         home.at(1) = realTax;
         totalCost = totalCost + maintenance + transportation + realTax + (mortgage / (pow((1. + (loanInterest)), j - 1.)));
         currentYearTotal = maintenance + transportation + realTax + (mortgage / (pow((1. + (loanInterest)), j - 1.)));
+
 
         home.at(6) = currentYearTotal;
         double nominal = homeValue - loanAmount;
@@ -116,6 +118,7 @@ void RunRentVsBuy(){
     double homeGross;
     double rentGross;
     double difference;
+    double mortgage;
 
     double homeTransportation = homeValues.at(0);
     double homeValue = homeValues.at(1);
@@ -132,16 +135,29 @@ void RunRentVsBuy(){
     double inflation = rentValues.at(3);
     double returnRate = rentValues.at(4);
 
+    mortgage = 12. * (loanAmount * (loanInterest / 12.) * pow((1. + (loanInterest / 12.)), (12. * loanTerm)))
+               / (pow((1. + (loanInterest / 12.)), (12. * loanTerm)) - 1.);
 
-
-    outputFile << "Year,Mortgage,Taxes(real),Home Transportation(real),Home Maintenance(real),Home Costs Total(real),Home Value(real), Home Investments Total(real), "
-                  "Home Profits(real),Home Gross(real),Rent(real),RentTransportation,Rent Cost Total(real),Rent Investment(real),Rent Gross(real),Home Gross-Rent Gross(real),BetterOption\n";
 
 
     for (int years = 1; years <= rentYears; years++) {
+        downPayment = downPayment - mortgage;
+        if (downPayment <= 0){
+            mortgage = 0;
+            loanTerm = years;
+        }
 
-        home = HomeBuyingCalculations(homeTransportation, homeValue, loanInterest, loanTerm, appreciation,
-                                      propertyTax, loanAmount, years);
+    outputFile << "Year,Mortgage,Taxes(real),Home Transportation(real),Home Maintenance(real),Home Costs Total(real),Home Value(real),Home Investments Total(real),Home Profits(real),Home Gross(real),Rent(real),Rent Transportation, Rent Costs Total (real),Rent Investments Total(real),Rent Gross(real),Home Gross - Rent Gross(real),Better Option\n";
+
+
+    for (int years = 1; years <= rentYears; years++) {
+        downPayment = downPayment - mortgage;
+        if (downPayment <= 0){
+            mortgage = 0;
+        }
+
+        home = HomeBuyingCalculations(homeTransportation, homeValue, inflation, rentYears, appreciation,
+                                      propertyTax, loanAmount, years, mortgage);
         rent = RentingCalculations(years, yearlyRent, rentTransportation);
 
         homeInvestment = homeInvestmentCalc(rent.at(1), home.at(6), inflation, returnRate,years, last_year_value);
@@ -151,10 +167,11 @@ void RunRentVsBuy(){
         outputFile << years <<",";
 
 //    std::cout << "Home Values: ";
-    for (int i = 0; i < 6; i++) {
-      //std::cout << home.at(i)<<", ";
-      outputFile << round(home.at(i))<<",";
-    }
+outputFile<<mortgage<<",";
+        for (int i = 1; i < 6; i++) {
+            //std::cout << home.at(i)<<", ";
+            outputFile << round(home.at(i))<<",";
+        }
 
         //std::cout << round(homeInvestment.at(0)) << ", ";
         outputFile << round(homeInvestment.at(0)) << ",";
@@ -295,6 +312,7 @@ std::vector<double> RentingInfo() {
 
     std::vector<double> values;
 
+    std::cout <<"==== Renting Information ===="<<std::endl;
     std::cout << "Enter your monthly rent payment: ";
     std::cin >> monthlyRent;
     yearlyRent = (12 * monthlyRent);
@@ -351,6 +369,7 @@ double CommuteFromApartment() {
     double miles;
     double transportationCost;
 
+    std::cout <<"==== Commute from apartment ===="<<std::endl;
     std::cout << "Enter how many miles from work your apartment is: ";
     std::cin >> miles;
     std::cout << "How will you be getting to work from your apartment?\n";
@@ -389,21 +408,3 @@ double modeOfTransportation() {
     return transportationCost;
 
 }
-
-//int writingfile(){
-//    std::ofstream outputFile;
-//    outputFile.open("demofile.txt");
-//
-//    std::cout<<"Now writing data to the file. \n";
-//
-//    // Write four names to the file
-//    outputFile<< "Bach\n" ;
-//    outputFile<< "hey\n" ;
-//    outputFile<< "sup\n" ;
-//    outputFile<< "yo\n" ;
-//
-//    // Close the file
-//    outputFile.close();
-//    std::cout <<"Done.\n";
-//    return 0;
-//}
