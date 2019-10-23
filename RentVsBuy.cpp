@@ -62,12 +62,11 @@ std::vector<double> HomeBuyingCalculations(double transportation,double homeValu
     mortgage = 12. * (loanAmount * (loanInterest / 12.) * pow((1. + (loanInterest / 12.)), (12. * loanTerm)))
                / (pow((1. + (loanInterest / 12.)), (12. * loanTerm)) - 1.);
 
-
     taxes = propertyTax*homeValue;
     double maintenance = 0.01 * homeValue;
     double purchasePrice = homeValue;
 
-    home.push_back(mortgage);
+    home.push_back(0);
     home.push_back(0);
     home.push_back(transportation);
     home.push_back(maintenance);
@@ -79,6 +78,7 @@ std::vector<double> HomeBuyingCalculations(double transportation,double homeValu
         if (j > loanTerm){
             mortgage = 0;
         }
+        home.at(0) = mortgage;
         realTax = (taxes* pow (1 + (appreciation / 12) , 12 * (j - 1)))/ (pow(1+(0.035),j-1));
         for (int i = 1; i <= 12; i++) {
             loanAmount = loanAmount * (1. + (loanInterest / 12.));
