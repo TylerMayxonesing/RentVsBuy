@@ -49,8 +49,9 @@ std::vector<double> HomeBuyingInfo(){
 }
 
 
-std::vector<double> HomeBuyingCalculations(double transportation,double homeValue, double loanInterest,
-                                           double loanTerm, double appreciation,double propertyTax, double loanAmount, int years, double downPayment) {
+std::vector<double> HomeBuyingCalculations(double transportation,double homeValue, double inflation,
+                                           double loanTerm, double appreciation,double propertyTax, double loanAmount,
+                                           int years, double downPayment) {
 
   std::vector<double> home;
   double taxes;
@@ -59,11 +60,9 @@ std::vector<double> HomeBuyingCalculations(double transportation,double homeValu
   double mortgage;
   double realHomeValue;
   double currentYearTotal;
-  double difference;
 
-
-  mortgage = 12. * (loanAmount * (loanInterest / 12.) * pow((1. + (loanInterest / 12.)), (12. * loanTerm)))
-      / (pow((1. + (loanInterest / 12.)), (12. * loanTerm)) - 1.);
+  mortgage = 12. * (loanAmount * (inflation / 12.) * pow((1. + (inflation / 12.)), (12. * loanTerm)))
+      / (pow((1. + (inflation / 12.)), (12. * loanTerm)) - 1.);
 
   taxes = propertyTax*homeValue;
   double maintenance = 0.01 * homeValue;
@@ -79,24 +78,26 @@ std::vector<double> HomeBuyingCalculations(double transportation,double homeValu
 
   for (int j = 1; j <= years; j++) {
 
-    home.at(0) = mortgage;
+    //home.at(0) = mortgage;
     realTax = (taxes* pow (1 + (appreciation / 12) , 12 * (j - 1)))/ (pow(1+(0.035),j-1));
     for (int i = 1; i <= 12; i++) {
-      loanAmount = loanAmount * (1. + (loanInterest / 12.));
+      loanAmount = loanAmount * (1. + (inflation / 12.));
       loanAmount = loanAmount - (mortgage / 12.);
       homeValue = homeValue * (1. + (appreciation / 12.));
     }
     home.at(1) = realTax;
-    totalCost = totalCost + maintenance + transportation + realTax + (mortgage / (pow((1. + (loanInterest)), j - 1.)));
-    currentYearTotal = maintenance + transportation + realTax + (mortgage / (pow((1. + (loanInterest)), j - 1.)));
-    downPayment = downPayment - (mortgage/ (pow((1. + (loanInterest)), j - 1.)));
-    if (downPayment <=0){
+    downPayment = downPayment - (mortgage/ (pow((1. + (inflation)), j - 1.)));
+    if (downPayment <= 0){
       mortgage = 0;
     }
+    home.at(0) = mortgage;
+
+    totalCost = totalCost + maintenance + transportation + realTax + (mortgage / (pow((1. + (inflation)), j - 1.)));
+    currentYearTotal = maintenance + transportation + realTax + (mortgage / (pow((1. + (inflation)), j - 1.)));
 
     home.at(6) = currentYearTotal;
     double nominal = homeValue - loanAmount;
-    realHomeValue = nominal / (pow(1+(0.035),j-1));
+    realHomeValue = nominal / (pow(1+(inflation),j-1));
   }
   home.at(4) = totalCost;
   home.at(5) = realHomeValue;
