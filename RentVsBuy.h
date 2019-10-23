@@ -11,17 +11,19 @@
 
 
 std::vector<double> HomeBuyingInfo();
-std::vector<double> HomeBuyingCalculations(double,double,double,double,double,double,double,double, double, double);
+std::vector<double> HomeBuyingCalculations(double,double,double,double,double,double,double,double);
 double CommuteFromHome();
 
 
 std::vector<double> RentingInfo();
 double CommuteFromApartment();
 std::vector<double> RentingCalculations(double, double, double);
+
 double modeOfTransportation();
 
 std::vector<double> homeInvestmentCalc(double, double, double, double, double, double);
 std::vector<double> rentInvestmentCalc(double, double, double, double, double, double, double);
+
 
 void RunRentVsBuy();
 
