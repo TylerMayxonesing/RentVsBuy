@@ -11,8 +11,7 @@ void PrintFile(std::ostream& out, const std::string& fileName){
 }
 
 int main(){
-    //RentingInfo();
     RunRentVsBuy();
-    //PrintFile(std::cout, "RentVsBuy.csv");
+    PrintFile(std::cout, "RentVsBuy.csv");
     return 0;
 }

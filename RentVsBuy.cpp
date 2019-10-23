@@ -62,6 +62,7 @@ std::vector<double> HomeBuyingCalculations(double transportation,double homeValu
     mortgage = 12. * (loanAmount * (loanInterest / 12.) * pow((1. + (loanInterest / 12.)), (12. * loanTerm)))
                / (pow((1. + (loanInterest / 12.)), (12. * loanTerm)) - 1.);
 
+
     taxes = propertyTax*homeValue;
     double maintenance = 0.01 * homeValue;
     double purchasePrice = homeValue;
@@ -133,8 +134,8 @@ void RunRentVsBuy(){
 
 
 
-    std::cout << "Year,Mortgage,Taxes(real),Home Transportation(real),Home Maintenance(real),Home Costs Total(real),Home Value(real), "
-                 "Rent(real), RentTransportation, RentCost"<<std::endl;
+    outputFile << "Year,Mortgage,Taxes(real),Home Transportation(real),Home Maintenance(real),Home Costs Total(real),Home Value(real), Home Investments Total(real), "
+                  "Home Profits(real),Home Gross(real),Rent(real),RentTransportation,Rent Cost Total(real),Rent Investment(real),Rent Gross(real),Home Gross-Rent Gross(real),BetterOption\n";
 
 
     for (int years = 1; years <= rentYears; years++) {
@@ -147,40 +148,51 @@ void RunRentVsBuy(){
         rentInvestment = rentInvestmentCalc(rent.at(1), home.at(6), inflation, returnRate,years, last_year_value_rent, downPayment);
         last_year_value_rent = rentInvestment.at(0);
 
-        std::cout << years <<", ";
+        outputFile << years <<",";
 
 //    std::cout << "Home Values: ";
     for (int i = 0; i < 6; i++) {
-      std::cout << home.at(i)<<", ";
+      //std::cout << home.at(i)<<", ";
+      outputFile << round(home.at(i))<<",";
     }
 
-        std::cout << "Investment Values: ";
-        std::cout << round(homeInvestment.at(0)) << ", ";
+        //std::cout << round(homeInvestment.at(0)) << ", ";
+        outputFile << round(homeInvestment.at(0)) << ",";
+
         homeProfit = homeInvestment.at(0) + home.at(5);
-        std::cout << round (homeProfit) << ", ";
+        //std::cout << round (homeProfit) << ", ";
+        outputFile << round (homeProfit) << ",";
+
         homeGross = homeProfit - home.at(4);
-        std::cout << homeGross << ", ";
+        //std::cout << homeGross << ", ";
+        outputFile<< round(homeGross) << ",";
 
-        std::cout << "Rent Values: ";
-        std::cout << yearlyRent << ", ";
-        std::cout << rentTransportation << ", ";
+        //std::cout << yearlyRent << ", ";
+        outputFile << round(yearlyRent) <<",";
+        //std::cout << rentTransportation << ", ";
+        outputFile << round(rentTransportation) << ",";
 
-        std::cout << rent.at(0)<<", ";
-        std::cout << "Rent Investment: ";
-        std::cout << rentInvestment.at(0)<< ", ";
+        //std::cout << rent.at(0)<<", ";
+        outputFile << round(rent.at(0)) << ",";
+        //std::cout << rentInvestment.at(0)<< ", ";
+        outputFile<< round(rentInvestment.at(0))<<",";
 
         rentGross = rentInvestment.at(0) - rent.at(0);
-        std::cout << round(rentGross)<< ", ";
+        //std::cout << round(rentGross)<< ",";
+        outputFile << round(rentGross) << ",";
 
         difference = homeGross - rentGross;
+        outputFile<<round(difference)<<",";
         if (difference > 0){
-            std::cout << "Owning";
+            //std::cout << "Owning";
+            outputFile <<"Owning";
         }
         else {
-            std::cout << "Renting";
+            //std::cout << "Renting";
+            outputFile <<"Renting";
         }
         last_year_value = homeInvestment.at(0);
-        std::cout << "\n";
+        outputFile << "\n";
     }
     outputFile.close();
 }
